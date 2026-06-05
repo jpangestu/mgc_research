@@ -1,4 +1,4 @@
-# Music Genre Classification CNN Research
+# Music Genre Classification Research
 
 This repository contains a modular deep learning pipeline built in PyTorch to train and evaluate a Convolutional Neural Network (CNN) for music genre classification. 
 
@@ -12,29 +12,29 @@ The project unifies and standardizes two separate audio datasets—**GTZAN** and
 mgc_research/
 │
 ├── data/
-│   └── processed/          # Local CSV dataset indices (tracked by Git)
+│   └── processed/          # Contains CSV index mapping track IDs to labels and relative file paths
 │
-├── models/                 # Directory where trained PyTorch checkpoints (.pth) are saved
+├── models/                 # Destination directory for saving trained model
 │
 ├── notebooks/
-│   └── colab_training.ipynb # Google Colab notebook for GPU training & Kaggle download
+│   └── colab_training.ipynb	# Google Colab setup for automated Kaggle dataset download and GPU training
 │
 ├── scripts/
-│   ├── check_jamendo_gtzan_match.py  # Diagnostic stats checker for Jamendo metadata
-│   ├── extract_jamendo_gtzan_subset.py # Preprocesses and balances Jamendo matrices
-│   ├── generate_gtzan_melspecs.py    # Converts GTZAN wave audio to Jamendo-spec matrices
-│   ├── cross_evaluate.py             # Evaluates trained models on the opposite dataset
-│   └── README.md                     # Documentation for helper scripts
+│   ├── check_jamendo_gtzan_match.py		# Checks metadata overlap between MTG-Jamendo and the 10 GTZAN genres
+│   ├── extract_jamendo_gtzan_subset.py	    # Filters, single-label validates, and balance-caps the Jamendo subset
+│   ├── generate_gtzan_melspecs.py			# Converts GTZAN raw wave audio to standardized log-Mel spectrogram arrays
+│   ├── cross_evaluate.py					# Evaluates a trained model checkpoint on the target opposite dataset
+│   └── README.md							# Usage instructions and parameter descriptions for scripts
 │
-├── src/                    # Core reusable package libraries
-│   ├── __init__.py         # Package level API exports
-│   ├── dataset.py          # PyTorch MusicGenreDataset class
-│   ├── models.py           # GenreClassifierCNN architecture
-│   └── training.py         # Training, validation, and epoch loops
+├── src/                    # Core modular PyTorch components imported by training and evaluation scripts
+│   ├── __init__.py         # Exposes package-level modules for direct importing
+│   ├── dataset.py          # Custom PyTorch Dataset class for lazy-loading Mel-spectrogram .npy files
+│   ├── models.py           # Convolutional Neural Network (CNN) classifier model definition
+│   └── training.py         # PyTorch training epoch, validation loop, and accuracy metric helpers
 │
-├── .gitignore              # Configured for Git, ignores raw matrices/personal IDE files
-├── main.py                 # Local CLI training orchestration script
-└── README.md               # Main project documentation (this file)
+├── .gitignore              # Excludes heavy local dataset arrays and system caches while tracking CSV indices
+├── main.py                 # Orchestrates model training pipelines on datasets via command-line arguments
+└── README.md               # Main project documentation covering setup, execution, and structure (this file)
 ```
 
 ---
