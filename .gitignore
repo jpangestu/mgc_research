@@ -1,0 +1,27 @@
+# --- Python Compiled Files ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Jupyter Notebooks Checkpoints ---
+.ipynb_checkpoints/
+
+# --- IDE/Editor Configurations ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Model Checkpoints & Weights ---
+models/
+
+# --- Raw Features & Dataset Files ---
+*.npy
+*.zip
+*_subset/
+
+# --- Data Directory ---
+# Ignore everything in data/processed by default EXCEPT the CSV index files
+# so they are tracked by Git and available on Google Colab.
+data/processed/*
+!data/processed/*.csv
