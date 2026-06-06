@@ -55,11 +55,11 @@ def evaluate(model, dataloader, criterion, device):
     val_acc = correct / total
     return val_loss, val_acc
 
-def train_model(model, train_loader, val_loader, epochs, lr, device, save_dir):
+def train_model(model, train_loader, val_loader, epochs, lr, device, save_dir, dataset_name="genre"):
     """Orchestrates the entire multi-epoch training process and saves the best model."""
     os.makedirs(save_dir, exist_ok=True)
     best_val_loss = float("inf")
-    best_model_path = os.path.join(save_dir, "best_genre_model.pth")
+    best_model_path = os.path.join(save_dir, f"best_genre_model_{dataset_name}.pth")
     
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)

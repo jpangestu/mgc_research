@@ -24,6 +24,7 @@ mgc_research/
 │   ├── extract_jamendo_gtzan_subset.py	    # Filters, single-label validates, and balance-caps the Jamendo subset
 │   ├── generate_gtzan_melspecs.py			# Converts GTZAN raw wave audio to standardized log-Mel spectrogram arrays
 │   ├── cross_evaluate.py					# Evaluates a trained model checkpoint on the target opposite dataset
+│   ├── convert_pth_to_onnx.py        # Python script to convert PyTorch .pth checkpoints to ONNX format
 │   └── README.md							# Usage instructions and parameter descriptions for scripts
 │
 ├── src/                    # Core modular PyTorch components imported by training and evaluation scripts
@@ -45,6 +46,7 @@ mgc_research/
 * **Strict Class Balancing:** Implements a class-balancing mechanism that caps extracted data at **361 tracks per genre** to avoid class bias.
 * **Separation of Concerns:** Keep model definitions and data loaders isolated in `src/` so they can be easily imported like a library.
 * **Google Colab Optimization:** Integrated with `kagglehub` for anonymous, zero-credential dataset downloads.
+* **ONNX Export Support:** Convert trained PyTorch checkpoints to self-contained ONNX models for deployment and cross-platform inference.
 
 ---
 
@@ -55,14 +57,11 @@ To run the code locally, set up a virtual environment (e.g., Anaconda/Miniconda)
 
 ```bash
 # Create and activate conda environment
-conda create -n mgc-dataset python=3.10
-conda activate mgc-dataset
+conda create -n mgc_research python=3.11 -y
+conda activate mgc_research
 
-# Install PyTorch (adjust CUDA command if using GPU locally)
-conda install pytorch torchvision torchaudio -c pytorch
-
-# Install other requirements
-pip install tqdm pandas numpy librosa kagglehub
+# Install all dependencies from requirements.txt
+pip install -r requirements.txt
 ```
 
 ### 2. Configure Local Settings (Optional)
@@ -101,14 +100,26 @@ Run `python main.py --help` to view all configurable parameters (such as `save_d
 For faster GPU training, upload this folder to Google Drive and open:
 `notebooks/colab_training.ipynb`
 
-This notebook will automatically mount Google Drive, download the preprocessed Mel-spectrogram datasets from Kaggle using `kagglehub` (no API key required), and launch training with GPU acceleration.
+This notebook will download the preprocessed Mel-spectrogram datasets from Kaggle using `kagglehub` (no API key required), and launch training with GPU acceleration.
 
 ### 4. Cross-Dataset Generalization Testing
 To evaluate how well a model trained on one dataset generalizes to the other:
 ```bash
 # Evaluate a Jamendo-trained model on the GTZAN dataset
 python scripts/cross_evaluate.py \
-    --model_path "models/jamendo/best_genre_model.pth" \
+    --model_path "models/best_genre_model_jamendo.pth" \
     --csv_file "data/processed/gtzan_single_label.csv" \
     --base_dir "path/to/gtzan_melspecs"
 ```
+
+### 5. Exporting Models to ONNX
+To convert trained PyTorch checkpoints into ONNX format for deployment or cross-platform inference:
+
+```bash
+# Auto-detects and exports default checkpoints in the models/ directory:
+python scripts/convert_pth_to_onnx.py
+
+# Export a specific checkpoint file:
+python scripts/convert_pth_to_onnx.py --model_path models/best_genre_model_jamendo.pth
+```
+This script loads the checkpoint weights, instantiates the model structure, runs a dummy input trace, and outputs self-contained `.onnx` files (e.g., `mgc_model_jamendo.onnx` and `mgc_model_gtzan.onnx`) inside the `models/` directory.

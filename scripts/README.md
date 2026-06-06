@@ -63,3 +63,20 @@ Converts raw audio tracks from the GTZAN dataset into log-scaled Mel-spectrogram
   * Extracts **96 Mel bands**.
   * Constrains the time dimension to exactly **1,366 frames** using structural padding/trimming.
   * Saves `.npy` arrays and writes a clean tracker index to `data/processed/gtzan_single_label.csv`.
+
+### 4. `convert_pth_to_onnx.py`
+Converts trained PyTorch model checkpoints (`.pth`) to the optimized, self-contained ONNX format.
+* **Purpose:** Exports trained classifier weights into a portable format for production deployment or cross-platform runtime inference.
+* **How to run:**
+  ```bash
+  # Auto-detect defaults (looks for best_genre_model_jamendo.pth/best_genre_model_gtzan.pth in models/):
+  python scripts/convert_pth_to_onnx.py
+
+  # Convert a specific model checkpoint:
+  python scripts/convert_pth_to_onnx.py --model_path models/best_genre_model_jamendo.pth
+  ```
+* **Key Steps:**
+  1. Instantiates a new `GenreClassifierCNN` with the target number of output classes (default is 10).
+  2. Loads weights from the selected `.pth` checkpoint.
+  3. Traces the model network with a dummy input of shape `[1, 1, 96, 1366]` using PyTorch's internal exporter.
+  4. Bundles the model parameters and architecture into a single, self-contained `.onnx` binary file under the `models/` directory (e.g. `mgc_model_jamendo.onnx` or `mgc_model_gtzan.onnx`), automatically cleaning up auxiliary external weights files.

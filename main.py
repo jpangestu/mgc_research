@@ -31,6 +31,12 @@ def parse_args():
     parser.add_argument("--save_dir", type=str, default="models", help="Directory to save the trained model weights.")
     parser.add_argument("--num_workers", type=int, default=2, help="Number of workers for DataLoader multi-threading.")
     parser.add_argument("--train_split", type=float, default=0.8, help="Ratio of training data (remaining goes to validation).")
+    parser.add_argument(
+        "--resume_path",
+        type=str,
+        default=None,
+        help="Path to a saved model checkpoint (.pth) to resume training from."
+    )
     
     return parser.parse_args()
 
@@ -85,12 +91,30 @@ def main():
     num_classes = len(full_dataset.label_to_idx)
     model = GenreClassifierCNN(num_classes=num_classes).to(device)
     
+    # Load checkpoint if resuming training
+    if args.resume_path is not None:
+        if os.path.exists(args.resume_path):
+            print(f"[-] Loading weights from checkpoint to resume training: {args.resume_path}")
+            model.load_state_dict(torch.load(args.resume_path, map_location=device))
+        else:
+            print(f"[!] Error: Checkpoint file not found at '{args.resume_path}'.")
+            return
+
     # Calculate parameter count
     total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"[+] Initialized GenreClassifierCNN with {num_classes} classes.")
     print(f" -> Total Trainable Parameters: {total_params:,}")
     
     # 7. Start Training Loop
+    # Extract dataset name from CSV file path for model checkpoint naming
+    csv_basename = os.path.basename(args.csv_file).lower()
+    if "jamendo" in csv_basename:
+        dataset_name = "jamendo"
+    elif "gtzan" in csv_basename:
+        dataset_name = "gtzan"
+    else:
+        dataset_name = os.path.splitext(csv_basename)[0]
+
     train_model(
         model=model,
         train_loader=train_loader,
@@ -98,7 +122,8 @@ def main():
         epochs=args.epochs,
         lr=args.lr,
         device=device,
-        save_dir=args.save_dir
+        save_dir=args.save_dir,
+        dataset_name=dataset_name
     )
 
 if __name__ == "__main__":
